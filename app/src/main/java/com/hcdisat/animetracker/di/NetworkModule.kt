@@ -1,5 +1,7 @@
 package com.hcdisat.animetracker.di
 
+import com.hcdisat.animetracker.network.ApiRepository
+import com.hcdisat.animetracker.network.IApiRepository
 import com.hcdisat.animetracker.network.KitsuApi
 import dagger.Module
 import dagger.Provides
@@ -48,6 +50,12 @@ class NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(KitsuApi::class.java)
+
+    /**
+     * provides [IApiRepository]
+     */
+    @Provides
+    fun providesApiRepository(kitsuApi: KitsuApi): IApiRepository = ApiRepository(kitsuApi)
 }
 
 private const val REQUEST_TIMEOUT = 15L

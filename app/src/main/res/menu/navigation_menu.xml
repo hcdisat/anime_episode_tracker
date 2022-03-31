@@ -5,4 +5,8 @@
         android:id="@+id/homeFragment"
         android:title="@string/bottom_nav_home"
         android:icon="@drawable/ic_home"/>
+
+    <item android:id="@+id/playground_fragment"
+        android:title="@string/bottom_nav_playground"
+        android:icon="@drawable/ic_android_black_24dp"/>
 </menu>
