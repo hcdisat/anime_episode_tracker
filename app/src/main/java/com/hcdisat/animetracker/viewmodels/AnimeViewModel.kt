@@ -19,12 +19,10 @@ class AnimeViewModel @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-
     private var _state: MutableLiveData<AnimeState> =
         MutableLiveData(AnimeState.LOADING)
     val state: LiveData<AnimeState> get() = _state
 
-    @FlowPreview
     fun getTrending() {
         resetState()
         viewModelScope.launch(ioDispatcher) {
@@ -34,7 +32,7 @@ class AnimeViewModel @Inject constructor(
         }
     }
 
-    private fun resetState() {
-        _state.value = AnimeState.LOADING
+    fun resetState() {
+        _state.value = AnimeState.DEFAULT
     }
 }
