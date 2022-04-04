@@ -4,4 +4,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="bottom_nav_home">Home</string>
     <string name="bottom_nav_playground">Playground</string>
+    <string name="anime_title">Kimetsu no Yaiba</string>
+    <string name="play">play</string>
+    <string name="trending_anime_header">Trending Anime</string>
+    <string name="cd">CD</string>
 </resources>
