@@ -7,12 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.hcdisat.animetracker.MainActivity
-import com.hcdisat.animetracker.R
-import com.hcdisat.animetracker.adapters.AnimeAdapter
 import com.hcdisat.animetracker.adapters.HomeSectionAdapter
 import com.hcdisat.animetracker.databinding.FragmentHomeBinding
 import com.hcdisat.animetracker.models.Anime
@@ -43,15 +38,15 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun handleStateChanged(animeState: AnimeState) = when(animeState) {
+    private fun handleStateChanged(animeState: AnimeState) = when (animeState) {
         is AnimeState.LOADING -> {}
-        is AnimeState.DEFAULT -> {}
         is AnimeState.ERROR -> throw animeState.throwable
-        is AnimeState.SUCCESS<*> -> {
-            val animeResponse = animeState.response as AnimeResponse
-            setCoverInfo(animeResponse.data[0])
+        is AnimeState.SUCCESS -> {
+            if (animeState.section == AnimeSections.TRENDING) {
+                val animeResponse = animeState.response
+                setCoverInfo(animeResponse.data[0])
+            }
             sectionAdapter.appendSection(animeState)
-            animeViewModel.resetState()
         }
     }
 
@@ -59,6 +54,18 @@ class HomeFragment : Fragment() {
         (requireActivity() as MainActivity).apply {
             collapsingToolbar.title = anime.attributes.titles.enJp
             loadBackDrop(anime.attributes.coverImage.small)
+        }
+    }
+
+    private fun softReload() {
+        animeViewModel.animeSectionData.apply {
+            (trending as AnimeState.SUCCESS).let {
+                setCoverInfo(it.response.data[0])
+                sectionAdapter.setAdapter(it)
+            }
+
+            sectionAdapter.appendSection((popular as AnimeState.SUCCESS))
+            sectionAdapter.appendSection((rated as AnimeState.SUCCESS))
         }
     }
 
@@ -77,8 +84,10 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (animeViewModel.state.value !is AnimeState.DEFAULT)
-            animeViewModel.getTrending()
+        when (animeViewModel.state.value) {
+            is AnimeState.SUCCESS -> softReload()
+            else -> animeViewModel.getTrending()
+        }
     }
 
     override fun onDestroy() {

@@ -3,6 +3,7 @@ package com.hcdisat.animetracker.network
 import com.hcdisat.animetracker.ui.AnimeSections
 import com.hcdisat.animetracker.viewmodels.state.AnimeState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -17,21 +18,21 @@ class ApiRepository @Inject constructor(
         executeRequest(
             { api.getTrending() },
             {
-                (it as AnimeState.SUCCESS<*>).apply {
+                (it as AnimeState.SUCCESS).apply {
                     section = AnimeSections.TRENDING
                 }
             }, {})
 
     override suspend fun getPopular(page: Int): Flow<AnimeState> =
-        getAnime(AnimeSortBy.POPULAR.realName, page){
-            (it as AnimeState.SUCCESS<*>).apply {
+        getAnime(AnimeSortBy.POPULAR.realName, page) {
+            (it as AnimeState.SUCCESS).apply {
                 section = AnimeSections.MOST_POPULAR
             }
         }
 
     override suspend fun getRated(page: Int): Flow<AnimeState> =
         getAnime(AnimeSortBy.MOST_RATED.realName) {
-            (it as AnimeState.SUCCESS<*>).apply {
+            (it as AnimeState.SUCCESS).apply {
                 section = AnimeSections.MOST_RATED
             }
         }

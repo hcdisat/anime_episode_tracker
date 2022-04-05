@@ -1,6 +1,7 @@
 package com.hcdisat.animetracker.network
 
 import com.hcdisat.animetracker.models.AnimeResponse
+import com.hcdisat.animetracker.ui.AnimeSections
 import com.hcdisat.animetracker.viewmodels.state.AnimeState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

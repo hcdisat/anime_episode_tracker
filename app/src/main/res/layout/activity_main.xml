@@ -18,7 +18,7 @@
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <!-- In CollapsingToolbarLayout sompe important attributes are:
+        <!-- In CollapsingToolbarLayout some important attributes are:
          i)  app:layout_scrollFlags which is used to specify how collapsing
              layout behaves when content is scrolled.I have used
              app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
