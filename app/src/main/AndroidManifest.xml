@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AnimeTracker">
         <activity
+            android:name=".ui.VideoPlayerActivity"
+            android:exported="false" />
+        <activity
             android:name=".PlayActivity"
             android:exported="false" />
         <activity

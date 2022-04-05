@@ -79,6 +79,8 @@ class HomeFragment : Fragment() {
 
         animeViewModel.state.observe(viewLifecycleOwner, ::handleStateChanged)
 
+        binding
+
         return binding.root
     }
 

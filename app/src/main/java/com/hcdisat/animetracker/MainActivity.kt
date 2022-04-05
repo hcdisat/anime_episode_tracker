@@ -1,13 +1,10 @@
 package com.hcdisat.animetracker
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.activityViewModels
-import androidx.navigation.findNavController
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -17,6 +14,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.hcdisat.animetracker.databinding.ActivityMainBinding
 import com.hcdisat.animetracker.viewmodels.AnimeViewModel
 import dagger.hilt.android.AndroidEntryPoint
+
 
 const val TAG = "TAG"
 
@@ -53,6 +51,13 @@ class MainActivity : AppCompatActivity() {
         )
 
         binding.navView.setupWithNavController(navHostFragment.navController)
+
+        binding.btnPlay.setOnClickListener {
+            val videoId = "Fee5vbFLYM4"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+            intent.putExtra("VIDEO_ID", videoId)
+            startActivity(intent)
+        }
     }
 
     fun loadBackDrop(imageUrl: String) {
