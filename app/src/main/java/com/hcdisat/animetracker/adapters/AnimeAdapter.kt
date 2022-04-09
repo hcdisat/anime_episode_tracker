@@ -10,7 +10,8 @@ import com.hcdisat.animetracker.databinding.AnimeItemBinding
 import com.hcdisat.animetracker.models.Anime
 
 class AnimeAdapter(
-    private var animes: List<Anime> = listOf()
+    private var animes: List<Anime> = listOf(),
+    private val onAnimeClicked: (anime: Anime) -> Unit
 ) : RecyclerView.Adapter<AnimeItemViewHolder>() {
 
     @SuppressLint("NotifyDataSetChanged")
@@ -25,7 +26,8 @@ class AnimeAdapter(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            onAnimeClicked
         )
 
     override fun onBindViewHolder(holder: AnimeItemViewHolder, position: Int) =
@@ -35,7 +37,8 @@ class AnimeAdapter(
 }
 
 class AnimeItemViewHolder(
-    private val binding: AnimeItemBinding
+    private val binding: AnimeItemBinding,
+    private val onAnimeClicked: (anime: Anime) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(anime: Anime) {
@@ -49,5 +52,6 @@ class AnimeItemViewHolder(
             .placeholder(R.drawable.ic_itadori)
             .into(binding.poster)
 
+        binding.root.setOnClickListener { onAnimeClicked(anime)}
     }
 }

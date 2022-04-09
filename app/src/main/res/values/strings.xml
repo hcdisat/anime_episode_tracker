@@ -9,4 +9,10 @@
     <string name="trending_anime_header">Trending Anime</string>
     <string name="cd">CD</string>
     <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
+    <string name="anime_title_text_details">BORUTO: NARUTO NEXT GENERATIONS</string>
+    <string name="anime_title_jp">鬼滅の刃 遊郭編</string>
+    <string name="anime_rank">1</string>
+    <string name="ageRatingGuide">17+ (violence profanity)</string>
+    <string name="anime_status">finished</string>
+    <string name="add_to_favorites_btn">Add to Favorites</string>
 </resources>

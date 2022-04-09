@@ -5,11 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hcdisat.animetracker.databinding.SectionItemBinding
+import com.hcdisat.animetracker.models.Anime
 import com.hcdisat.animetracker.models.AnimeResponse
 import com.hcdisat.animetracker.viewmodels.state.AnimeState
 
 class HomeSectionAdapter(
-    private var sections: MutableList<AnimeState.SUCCESS> = mutableListOf()
+    private var sections: MutableList<AnimeState.SUCCESS> = mutableListOf(),
+    private val onAnimeClicked: (anime: Anime) -> Unit
 ): RecyclerView.Adapter<HomeSectionViewHolder>() {
 
     fun appendSection(newSection: AnimeState.SUCCESS) {
@@ -29,7 +31,8 @@ class HomeSectionAdapter(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            onAnimeClicked
         )
 
     override fun onBindViewHolder(holder: HomeSectionViewHolder, position: Int) =
@@ -39,11 +42,12 @@ class HomeSectionAdapter(
 }
 
 class HomeSectionViewHolder(
-    private val binding: SectionItemBinding
+    private val binding: SectionItemBinding,
+    private val onAnimeClicked: (anime: Anime) -> Unit
 ): RecyclerView.ViewHolder(binding.root) {
 
     private val animeAdapter by lazy {
-        AnimeAdapter()
+        AnimeAdapter(onAnimeClicked = onAnimeClicked)
     }
 
     fun bind(animeState: AnimeState.SUCCESS) {

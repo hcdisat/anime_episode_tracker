@@ -1,10 +1,8 @@
 package com.hcdisat.animetracker.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.hcdisat.animetracker.di.DispatchersModule.IODispatcher
+import com.hcdisat.animetracker.models.Anime
 import com.hcdisat.animetracker.network.IApiRepository
 import com.hcdisat.animetracker.viewmodels.state.AnimeSectionData
 import com.hcdisat.animetracker.viewmodels.state.AnimeState
@@ -26,10 +24,15 @@ class AnimeViewModel @Inject constructor(
     private var _animeSectionData: AnimeSectionData = AnimeSectionData()
     val animeSectionData: AnimeSectionData get() = _animeSectionData
 
+    var selectedAnime: Anime? = null
 
     fun getTrending() {
+//        liveData<Int> {
+//            val foo = Tri
+//        }
         _state.value = AnimeState.LOADING
         viewModelScope.launch(ioDispatcher) {
+
             apiRepository.getTrending().collect {
                 _state.postValue(it)
                 _animeSectionData.trending = it

@@ -12,6 +12,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.hcdisat.animetracker.databinding.ActivityMainBinding
+import com.hcdisat.animetracker.models.Anime
 import com.hcdisat.animetracker.viewmodels.AnimeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,13 +26,8 @@ class MainActivity : AppCompatActivity() {
 
     private val animeViewModel: AnimeViewModel by viewModels()
 
-    val collapsingToolbar by lazy {
-        binding.collapsingToolbar
-    }
-
-    val appBarLayout by lazy {
-        binding.appBarLayout
-    }
+    val collapsingToolbar by lazy { binding.collapsingToolbar }
+    val appBarLayout by lazy { binding.appBarLayout }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +41,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(
             navHostFragment.navController, AppBarConfiguration(
                 setOf(
-                    R.id.homeFragment
+                    R.id.homeFragment,
+                    R.id.animeDetailsFragment
                 )
             )
         )
@@ -53,17 +50,26 @@ class MainActivity : AppCompatActivity() {
         binding.navView.setupWithNavController(navHostFragment.navController)
 
         binding.btnPlay.setOnClickListener {
-            val videoId = "Fee5vbFLYM4"
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
-            intent.putExtra("VIDEO_ID", videoId)
-            startActivity(intent)
+            animeViewModel.selectedAnime?.let {
+                val videoId = it.attributes.youtubeVideoId
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+                intent.putExtra("VIDEO_ID", videoId)
+                startActivity(intent)
+            }
         }
     }
 
-    fun loadBackDrop(imageUrl: String) {
+    private fun loadBackDrop(imageUrl: String) {
         Glide.with(this)
             .load(imageUrl)
             .apply(RequestOptions.centerCropTransform())
             .into(binding.numberOneCover)
+    }
+
+    fun setCoverInfo() {
+        animeViewModel.selectedAnime?.let {
+            loadBackDrop(it.attributes.coverImage.small)
+            appBarLayout.setExpanded(true)
+        }
     }
 }

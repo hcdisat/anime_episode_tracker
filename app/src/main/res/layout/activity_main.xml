@@ -30,15 +30,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
-            app:expandedTitleMarginBottom="24dp"
-            app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
-            app:title="@string/app_name">
+            app:expandedTitleTextColor="#00FFFFFF"
+            app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
 
             <ImageView
                 android:id="@+id/number_one_cover"
                 android:layout_width="match_parent"
-                android:layout_height="256dp"
+                android:layout_height="@dimen/app_bar_height"
                 android:contentDescription="@string/cd"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
@@ -51,6 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
+                app:title="@string/app_name"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -79,13 +78,6 @@
         app:layout_anchor="@id/appBarLayout"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_play" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="#72000000"
-        android:contentDescription="@string/cd"
-        app:layout_anchor="@id/btn_play"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
