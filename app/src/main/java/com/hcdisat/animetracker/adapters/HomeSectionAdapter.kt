@@ -5,25 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hcdisat.animetracker.databinding.SectionItemBinding
-import com.hcdisat.animetracker.models.Anime
-import com.hcdisat.animetracker.models.AnimeResponse
-import com.hcdisat.animetracker.viewmodels.state.AnimeState
 
 class HomeSectionAdapter(
-    private var sections: MutableList<AnimeState.SUCCESS> = mutableListOf(),
-    private val onAnimeClicked: (anime: Anime) -> Unit
+    private var sections: AdapterSections,
 ): RecyclerView.Adapter<HomeSectionViewHolder>() {
-
-    fun appendSection(newSection: AnimeState.SUCCESS) {
-        sections.add(newSection)
-        notifyItemInserted(itemCount - 1)
-    }
-
-    fun setAdapter(newSection: AnimeState.SUCCESS) {
-        sections = mutableListOf()
-        sections.add(newSection)
-        notifyDataSetChanged()
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeSectionViewHolder =
         HomeSectionViewHolder(
@@ -32,35 +17,44 @@ class HomeSectionAdapter(
                 parent,
                 false
             ),
-            onAnimeClicked
         )
 
     override fun onBindViewHolder(holder: HomeSectionViewHolder, position: Int) =
-        holder.bind(sections[position])
+        holder.bind(sections)
 
-    override fun getItemCount(): Int = sections.size
+    override fun getItemCount(): Int = 1
 }
 
 class HomeSectionViewHolder(
     private val binding: SectionItemBinding,
-    private val onAnimeClicked: (anime: Anime) -> Unit
 ): RecyclerView.ViewHolder(binding.root) {
 
-    private val animeAdapter by lazy {
-        AnimeAdapter(onAnimeClicked = onAnimeClicked)
-    }
+    fun bind(sections: AdapterSections) {
+        binding.trendingList.apply {
+            layoutManager = createLayoutManager()
+            adapter = sections.trending
+        }
 
-    fun bind(animeState: AnimeState.SUCCESS) {
-        animeAdapter.setAnimeList((animeState.response).data)
-        binding.sectionText.text = animeState.section.realName
-        binding.animeList.apply {
-            layoutManager = LinearLayoutManager(
-                binding.root.context,
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
+        binding.popularList.apply {
+            layoutManager = createLayoutManager()
+            adapter = sections.mostPopular
+        }
 
-            adapter = animeAdapter
+        binding.mostRatedList.apply {
+            layoutManager = createLayoutManager()
+            adapter = sections.mostRated
         }
     }
+
+    private fun createLayoutManager() =
+        LinearLayoutManager(
+            binding.root.context,
+            LinearLayoutManager.HORIZONTAL,
+            false)
 }
+
+data class AdapterSections(
+    val trending: AnimeAdapter,
+    val mostPopular: AnimeAdapter,
+    val mostRated: AnimeAdapter
+)

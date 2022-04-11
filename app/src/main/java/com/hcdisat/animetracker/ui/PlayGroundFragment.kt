@@ -15,10 +15,6 @@ class PlayGroundFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        (requireActivity() as MainActivity).apply {
-            appBarLayout.setExpanded(false)
-            collapsingToolbar.title = getString(R.string.app_name)
-        }
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_play_ground, container, false)
     }

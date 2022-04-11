@@ -1,21 +1,14 @@
 package com.hcdisat.animetracker.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.hcdisat.animetracker.MainActivity
-import com.hcdisat.animetracker.R
-import com.hcdisat.animetracker.adapters.HomeSectionAdapter
+import com.hcdisat.animetracker.adapters.*
 import com.hcdisat.animetracker.databinding.FragmentHomeBinding
 import com.hcdisat.animetracker.models.Anime
-import com.hcdisat.animetracker.models.AnimeResponse
-import com.hcdisat.animetracker.viewmodels.AnimeViewModel
 import com.hcdisat.animetracker.viewmodels.state.AnimeState
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,50 +18,67 @@ class HomeFragment : AnimeBaseFragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val sectionAdapter by lazy { HomeSectionAdapter(onAnimeClicked = ::onAnimeClicked) }
+    private val concatAdapter by lazy { ConcatAdapter() }
+    private val bannerAdapter by lazy { BannerAdapter() }
+    private val sections by lazy {
+        AdapterSections(
+            trendingAdapter,
+            mostPopularAdapter,
+            topRatedAdapter
+        )
+    }
+    private val homeSectionAdapter by lazy { HomeSectionAdapter(sections) }
+    private val trendingAdapter by lazy { AnimeAdapter(onAnimeClicked = ::onAnimeClicked) }
+    private val mostPopularAdapter by lazy { AnimeAdapter(onAnimeClicked = ::onAnimeClicked) }
+    private val topRatedAdapter by lazy { AnimeAdapter(onAnimeClicked = ::onAnimeClicked) }
 
     private fun onAnimeClicked(anime: Anime) {
         animeViewModel.selectedAnime = anime
-        findNavController().navigate(R.id.animeDetailsFragment)
+        AnimeDetailsFragment
+            .newAnimeDetailsFragment()
+            .show(childFragmentManager, AnimeDetailsFragment.TAG)
     }
 
     private fun bindAnimeLists() {
+        concatAdapter.addAdapter(bannerAdapter)
+        concatAdapter.addAdapter(homeSectionAdapter)
         binding.homeSections.apply {
-            layoutManager = LinearLayoutManager(
-                requireContext(),
-                LinearLayoutManager.VERTICAL,
-                false
-            )
-
-            adapter = sectionAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = concatAdapter
         }
     }
 
     private fun handleStateChanged(animeState: AnimeState) = when (animeState) {
-        is AnimeState.LOADING -> {}
+        is AnimeState.LOADING -> {
+            binding.loading.visibility = View.VISIBLE
+            binding.homeSections.visibility = View.GONE
+        }
         is AnimeState.ERROR -> throw animeState.throwable
         is AnimeState.SUCCESS -> {
-            if (animeState.section == AnimeSections.TRENDING) {
-                val animeResponse = animeState.response
-                animeViewModel.selectedAnime = animeResponse.data[0]
-                setCoverInfo()
+            when(animeState.section) {
+                AnimeSections.TRENDING -> {
+                    val animeResponse = animeState.response
+                    animeViewModel.selectedAnime = animeResponse.data[0]
+                    setBanner()
+                    trendingAdapter.setAnimeList(animeState.response.data)
+                }
+                AnimeSections.MOST_POPULAR ->
+                    mostPopularAdapter.setAnimeList(animeState.response.data)
+                AnimeSections.MOST_RATED ->
+                    topRatedAdapter.setAnimeList(animeState.response.data)
             }
-            sectionAdapter.appendSection(animeState)
+            binding.loading.visibility = View.GONE
+            binding.homeSections.visibility = View.VISIBLE
         }
     }
 
-    private fun setCoverInfo() = (requireActivity() as MainActivity).setCoverInfo()
-
-    private fun softReload() {
-        animeViewModel.animeSectionData.apply {
-            (trending as AnimeState.SUCCESS).let {
-                animeViewModel.selectedAnime = it.response.data[0]
-                setCoverInfo()
-                sectionAdapter.setAdapter(it)
-            }
-
-            sectionAdapter.appendSection((popular as AnimeState.SUCCESS))
-            sectionAdapter.appendSection((rated as AnimeState.SUCCESS))
+    private fun setBanner() {
+        animeViewModel.selectedAnime?.let {
+            bannerAdapter.setBanner(BannerData(
+                it.attributes.coverImage.small,
+                false,
+                animeViewModel.playAction
+            ))
         }
     }
 
@@ -77,22 +87,11 @@ class HomeFragment : AnimeBaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(layoutInflater)
-
         bindAnimeLists()
 
-        animeViewModel.state.observe(viewLifecycleOwner, ::handleStateChanged)
-
         binding
-
+        animeViewModel.getTrending().observe(viewLifecycleOwner, ::handleStateChanged)
         return binding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-        when (animeViewModel.state.value) {
-            is AnimeState.SUCCESS -> softReload()
-            else -> animeViewModel.getTrending()
-        }
     }
 
     override fun onDestroy() {

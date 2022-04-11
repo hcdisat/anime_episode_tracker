@@ -1,6 +1,5 @@
 package com.hcdisat.animetracker.models
 
-
 import com.google.gson.annotations.SerializedName
 
 data class Anime(
@@ -11,5 +10,7 @@ data class Anime(
     @SerializedName("links")
     val links: Links,
     @SerializedName("type")
-    val type: String
+    val type: String,
+    @SerializedName("relationships")
+    val relationships: Relationships
 )

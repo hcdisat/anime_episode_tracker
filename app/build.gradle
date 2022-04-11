@@ -51,14 +51,13 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
 
-    //picasso
+    //glide
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
 
     //room database
     implementation "androidx.room:room-runtime:2.4.2"
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.test.ext:truth:1.4.0'
+    implementation 'androidx.room:room-ktx:2.4.2'
     kapt "androidx.room:room-compiler:2.4.2"
 
     implementation 'androidx.navigation:navigation-fragment-ktx:2.4.1'
@@ -72,6 +71,9 @@ dependencies {
     //hilt
     implementation "com.google.dagger:hilt-android:2.38.1"
     kapt "com.google.dagger:hilt-compiler:2.38.1"
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.test.ext:truth:1.4.0'
 
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.3'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'

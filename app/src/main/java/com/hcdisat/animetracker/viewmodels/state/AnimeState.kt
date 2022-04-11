@@ -2,6 +2,7 @@ package com.hcdisat.animetracker.viewmodels.state
 
 import com.hcdisat.animetracker.models.Anime
 import com.hcdisat.animetracker.models.AnimeResponse
+import com.hcdisat.animetracker.models.transformers.AnimeAndEpisodes
 import com.hcdisat.animetracker.ui.AnimeSections
 
 sealed class AnimeState {
@@ -14,10 +15,19 @@ sealed class AnimeState {
     class ERROR(val throwable: Throwable) : AnimeState()
 }
 
+sealed interface UIState {
+    object LOADING : UIState
+    class SUCCESS<T>(val response: T) : UIState
+    class ERROR(val throwable: Throwable) : UIState
+}
+
 class AnimeSectionData(
     var trending: AnimeState = AnimeState.LOADING,
     var popular: AnimeState = AnimeState.LOADING,
     var rated: AnimeState = AnimeState.LOADING
-) {
+)
 
+sealed interface DBOperationsState {
+    object REMOVED : DBOperationsState
+    object SAVED : DBOperationsState
 }

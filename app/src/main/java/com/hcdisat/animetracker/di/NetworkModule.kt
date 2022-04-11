@@ -1,8 +1,8 @@
 package com.hcdisat.animetracker.di
 
-import com.hcdisat.animetracker.network.ApiRepository
-import com.hcdisat.animetracker.network.IApiRepository
-import com.hcdisat.animetracker.network.KitsuApi
+import com.hcdisat.animetracker.data.network.ApiRepository
+import com.hcdisat.animetracker.data.network.IApiRepository
+import com.hcdisat.animetracker.data.network.KitsuApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +12,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @Module
 @InstallIn(SingletonComponent::class)

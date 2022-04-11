@@ -1,10 +1,10 @@
-package com.hcdisat.animetracker.network
+package com.hcdisat.animetracker.data.network
 
+import com.hcdisat.animetracker.models.episodes.EpisodesResponse
 import com.hcdisat.animetracker.ui.AnimeSections
 import com.hcdisat.animetracker.viewmodels.state.AnimeState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import retrofit2.Response
 import javax.inject.Inject
 
 class ApiRepository @Inject constructor(
@@ -37,9 +37,12 @@ class ApiRepository @Inject constructor(
             }
         }
 
+    override suspend fun getEpisodes(id: String): Response<EpisodesResponse> = api.getEpisodes(id)
+
+
     private suspend fun getAnime(
         sortBy: String,
-        page: Int = KitsuApi.PAGE_LIMIT,
+        page: Int = KitsuApi.ANIME_PAGE_LIMIT,
         success: (animeState: AnimeState) -> Unit
     ): Flow<AnimeState> = executeRequest({ api.getAnime(page, sortBy) }, { success(it) }) {}
 }

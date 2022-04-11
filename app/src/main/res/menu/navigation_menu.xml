@@ -9,8 +9,4 @@
     <item android:id="@+id/playground_fragment"
         android:title="@string/bottom_nav_playground"
         android:icon="@drawable/ic_android_black_24dp"/>
-
-    <item android:id="@+id/animeDetailsFragment"
-        android:title="@string/app_name"
-        android:icon="@drawable/ic_play"/>
 </menu>

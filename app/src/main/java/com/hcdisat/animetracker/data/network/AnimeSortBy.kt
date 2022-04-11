@@ -1,4 +1,4 @@
-package com.hcdisat.animetracker.network
+package com.hcdisat.animetracker.data.network
 
 enum class AnimeSortBy(val realName: String) {
     POPULAR("user_count"),

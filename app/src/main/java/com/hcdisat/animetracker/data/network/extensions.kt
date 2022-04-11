@@ -1,7 +1,6 @@
-package com.hcdisat.animetracker.network
+package com.hcdisat.animetracker.data.network
 
 import com.hcdisat.animetracker.models.AnimeResponse
-import com.hcdisat.animetracker.ui.AnimeSections
 import com.hcdisat.animetracker.viewmodels.state.AnimeState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -10,7 +9,7 @@ import java.lang.Exception
 
 inline fun IApiRepository.executeRequest(
     crossinline resource: suspend () -> Response<AnimeResponse>,
-     crossinline success: (state: AnimeState) -> Unit,
+    crossinline success: (state: AnimeState) -> Unit,
     crossinline error: (throwable: Throwable) -> Unit
 ): Flow<AnimeState> = flow {
     try {

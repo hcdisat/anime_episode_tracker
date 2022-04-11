@@ -5,5 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Links(
     @SerializedName("self")
-    val self: String
+    val self: String,
+    @SerializedName("related")
+    val related: String,
 )
