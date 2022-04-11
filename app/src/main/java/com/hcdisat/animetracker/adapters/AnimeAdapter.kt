@@ -48,7 +48,6 @@ class AnimeItemViewHolder(
         Glide.with(binding.root)
             .load(anime.attributes.posterImage.small)
             .optionalCenterCrop()
-            .placeholder(R.drawable.ic_launcher_background)
             .placeholder(R.drawable.ic_itadori)
             .into(binding.poster)
 

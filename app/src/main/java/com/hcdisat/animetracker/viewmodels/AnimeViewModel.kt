@@ -27,9 +27,13 @@ class AnimeViewModel @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private var _state: MutableLiveData<AnimeState> =
-        MutableLiveData(AnimeState.LOADING)
-    val state: LiveData<AnimeState> get() = _state
+    private var _animeSavedState: MutableLiveData<Boolean> =
+        MutableLiveData(false)
+    val animeSavedState: LiveData<Boolean> get() = _animeSavedState
+
+    private var _favoriteState: MutableLiveData<DBOperationsState> =
+        MutableLiveData(DBOperationsState.LOADING)
+    val favoriteState: LiveData<DBOperationsState> = _favoriteState
 
     private val _animeSectionData: AnimeSectionData = AnimeSectionData()
 
@@ -88,9 +92,30 @@ class AnimeViewModel @Inject constructor(
         }
     }
 
+    fun isFavorite(animeId: String) {
+        viewModelScope.launch(ioDispatcher) {
+            databaseRepository.getAnimeById(animeId).collect {
+                _animeSavedState.postValue(it != null)
+            }
+        }
+    }
+
+    fun loadFavorites() {
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                databaseRepository.getAll().collect {
+                    _favoriteState.postValue(DBOperationsState.RESULT_SET(it))
+                }
+            }
+            catch (e: Exception) {
+                _favoriteState.postValue(DBOperationsState.ERROR)
+            }
+        }
+    }
+
     fun saveAnime(
         animeAndEpisodes: AnimeAndEpisodes
-    ): Flow<DBOperationsState> = flow {
+    ): LiveData<DBOperationsState> = liveData {
         viewModelScope.launch(ioDispatcher) {
             databaseRepository.getAnimeById(animeAndEpisodes.anime.animeId).collect { anime ->
                 anime?.let {
@@ -99,7 +124,7 @@ class AnimeViewModel @Inject constructor(
                             emit(DBOperationsState.REMOVED)
                         }
                     }
-                } ?: databaseRepository.save(animeAndEpisodes.anime).collect {
+                } ?: databaseRepository.save(animeAndEpisodes.anime.apply { saved = true }).collect {
                     databaseRepository.save(animeAndEpisodes.episodes).collect {
                         withContext(Dispatchers.Main) {
                             emit(DBOperationsState.SAVED)

@@ -33,7 +33,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(
             navHostFragment.navController, AppBarConfiguration(
                 setOf(
-                    R.id.homeFragment
+                    R.id.homeFragment,
+                    R.id.favorites_fragment
                 )
             )
         )
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         animeViewModel.playAction = ::playTrailer
     }
 
-    fun playTrailer() {
+    private fun playTrailer() {
         animeViewModel.selectedAnime?.let {
             val videoId = it.attributes.youtubeVideoId
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))

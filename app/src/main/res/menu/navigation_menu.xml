@@ -6,7 +6,7 @@
         android:title="@string/bottom_nav_home"
         android:icon="@drawable/ic_home"/>
 
-    <item android:id="@+id/playground_fragment"
-        android:title="@string/bottom_nav_playground"
-        android:icon="@drawable/ic_android_black_24dp"/>
+    <item android:id="@+id/favorites_fragment"
+        android:title="@string/bottom_nav_favorites"
+        android:icon="@drawable/ic_favorite"/>
 </menu>

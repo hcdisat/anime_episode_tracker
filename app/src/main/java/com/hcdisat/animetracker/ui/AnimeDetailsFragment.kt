@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcdisat.animetracker.R
@@ -25,6 +26,11 @@ import com.hcdisat.animetracker.viewmodels.AnimeViewModel
 import com.hcdisat.animetracker.viewmodels.state.DBOperationsState
 import com.hcdisat.animetracker.viewmodels.state.UIState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.math.log
 
 @AndroidEntryPoint
 class AnimeDetailsFragment : DialogFragment() {
@@ -34,13 +40,26 @@ class AnimeDetailsFragment : DialogFragment() {
 
     private val concatAdapter by lazy { ConcatAdapter() }
 
-    private lateinit var anime: AnimeTransformer
+    private val animeDetailsAdapter by lazy {
+        AnimeDetailsAdapter(animeAndEpisodes) { anime ->
+            animeViewModel.saveAnime(anime).observe(viewLifecycleOwner) {
+                Log.d("TAG", "handleState: DONE!")
+            }
+        }
+    }
 
+    private lateinit var animeAndEpisodes: AnimeAndEpisodes
+    private lateinit var anime: AnimeTransformer
     private val episodes: MutableList<EpisodeTransformer> = mutableListOf()
 
     private val animeViewModel: AnimeViewModel by activityViewModels()
 
+    fun setTransformer(animeTransformer: AnimeAndEpisodes) {
+        animeAndEpisodes = animeTransformer
+    }
+
     private fun setRecycler() {
+        concatAdapter.addAdapter(animeDetailsAdapter)
         concatAdapter.addAdapter(0, BannerAdapter(
             BannerData(
                 animeViewModel.selectedAnime?.attributes?.posterImage?.small ?: "",
@@ -63,6 +82,10 @@ class AnimeDetailsFragment : DialogFragment() {
         _binding = AnimeDetailsContainerBinding
             .inflate(inflater, container, false)
 
+        animeViewModel.animeSavedState.observe(viewLifecycleOwner) {
+            animeAndEpisodes.anime.saved = it
+        }
+
         animeViewModel.selectedAnime?.let {
             anime = AnimeTransformer(
                 animeId = it.id,
@@ -71,9 +94,11 @@ class AnimeDetailsFragment : DialogFragment() {
                 ratingRank = it.attributes.ratingRank,
                 ageRatingGuide = it.attributes.ageRatingGuide,
                 description = it.attributes.description,
-                status = it.attributes.status
+                status = it.attributes.status,
+                coverImage = it.attributes.posterImage.small
             )
         }
+
         setRecycler()
         return binding.root
     }
@@ -83,6 +108,8 @@ class AnimeDetailsFragment : DialogFragment() {
         animeViewModel
             .getEpisodes(anime.animeId)
             .observe(viewLifecycleOwner, ::handleState)
+
+        animeViewModel.isFavorite(anime.animeId)
     }
 
     private fun handleState(uiState: UIState) {
@@ -94,22 +121,18 @@ class AnimeDetailsFragment : DialogFragment() {
             is UIState.SUCCESS<*> -> {
                 (uiState.response as EpisodesResponse)
                     .episodes.map {
-                        episodes.add(EpisodeTransformer(
-                            id = it.id,
-                            animeId = anime.animeId,
-                            title = it.attributes.episodeName(),
-                            thumbnail = it.attributes.thumbnail?.original ?: "",
-                            seasonNumber = it.attributes.seasonNumber,
-                            duration = it.attributes.length
-                        ))
+                        episodes.add(
+                            EpisodeTransformer(
+                                id = it.id,
+                                animeId = anime.animeId,
+                                title = it.attributes.episodeName(),
+                                thumbnail = it.attributes.thumbnail?.original ?: "",
+                                seasonNumber = it.attributes.seasonNumber,
+                                duration = it.attributes.length
+                            )
+                        )
                     }
-                concatAdapter.addAdapter(
-                    AnimeDetailsAdapter(
-                        AnimeAndEpisodes(anime, episodes)
-                    ) { anime ->
-                        animeViewModel.saveAnime(anime)
-                    }
-                )
+                concatAdapter.notifyItemRangeChanged(1, 1)
             }
         }
     }
@@ -122,6 +145,7 @@ class AnimeDetailsFragment : DialogFragment() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         }
+        setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
     }
 
     override fun onDestroy() {
@@ -132,8 +156,14 @@ class AnimeDetailsFragment : DialogFragment() {
     companion object {
         const val TAG = "AnimeDetailsFragment"
 
-        fun newAnimeDetailsFragment() = AnimeDetailsFragment().apply {
-            setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        fun newAnimeDetailsFragment(animeTransformer: AnimeAndEpisodes? = null): AnimeDetailsFragment {
+            val dialog = AnimeDetailsFragment()
+            animeTransformer?.let {
+                dialog.setTransformer(it)
+            }
+
+            return dialog
         }
+
     }
 }

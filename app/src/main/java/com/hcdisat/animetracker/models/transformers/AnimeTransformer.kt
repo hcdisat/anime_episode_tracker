@@ -12,5 +12,7 @@ data class AnimeTransformer(
     var ratingRank: Int?,
     var ageRatingGuide: String?,
     var description: String?,
-    var status: String?
+    var saved: Boolean = false,
+    var status: String?,
+    var coverImage: String?
 )

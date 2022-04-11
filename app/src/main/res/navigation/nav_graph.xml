@@ -11,8 +11,8 @@
         android:label="@string/app_name"
         tools:layout="@layout/fragment_sections" />
     <fragment
-        android:id="@+id/playground_fragment"
-        android:name="com.hcdisat.animetracker.ui.PlayGroundFragment"
-        android:label="Playground"
-        tools:layout="@layout/fragment_play_ground" />
+        android:id="@+id/favorites_fragment"
+        android:name="com.hcdisat.animetracker.ui.FavoritesFragment"
+        android:label="@string/fragment_favorites_label"
+        tools:layout="@layout/fragment_favorites" />
 </navigation>
