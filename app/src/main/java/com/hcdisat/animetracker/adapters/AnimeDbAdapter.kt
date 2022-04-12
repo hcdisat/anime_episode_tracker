@@ -8,7 +8,6 @@ import com.bumptech.glide.Glide
 import com.hcdisat.animetracker.R
 import com.hcdisat.animetracker.databinding.AnimeItemBinding
 import com.hcdisat.animetracker.models.transformers.AnimeAndEpisodes
-import com.hcdisat.animetracker.models.transformers.AnimeTransformer
 
 class AnimeDbAdapter(
     private var animes: List<AnimeAndEpisodes> = listOf(),

@@ -14,9 +14,6 @@ import com.hcdisat.animetracker.viewmodels.state.DBOperationsState
 import com.hcdisat.animetracker.viewmodels.state.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -104,7 +101,7 @@ class AnimeViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             try {
                 databaseRepository.getAll().collect {
-                    _favoriteState.postValue(DBOperationsState.RESULT_SET(it))
+                    _favoriteState.postValue(DBOperationsState.RESULTS(it))
                 }
             }
             catch (e: Exception) {

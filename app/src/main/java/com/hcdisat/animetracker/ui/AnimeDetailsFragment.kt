@@ -5,14 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.hcdisat.animetracker.R
 import com.hcdisat.animetracker.adapters.AnimeDetailsAdapter
 import com.hcdisat.animetracker.adapters.BannerAdapter
 import com.hcdisat.animetracker.adapters.BannerData
@@ -23,14 +19,8 @@ import com.hcdisat.animetracker.models.transformers.AnimeTransformer
 import com.hcdisat.animetracker.models.transformers.EpisodeTransformer
 import com.hcdisat.animetracker.models.transformers.episodeName
 import com.hcdisat.animetracker.viewmodels.AnimeViewModel
-import com.hcdisat.animetracker.viewmodels.state.DBOperationsState
 import com.hcdisat.animetracker.viewmodels.state.UIState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.math.log
 
 @AndroidEntryPoint
 class AnimeDetailsFragment : DialogFragment() {
@@ -41,14 +31,14 @@ class AnimeDetailsFragment : DialogFragment() {
     private val concatAdapter by lazy { ConcatAdapter() }
 
     private val animeDetailsAdapter by lazy {
-        AnimeDetailsAdapter(animeAndEpisodes) { anime ->
+        AnimeDetailsAdapter { anime ->
             animeViewModel.saveAnime(anime).observe(viewLifecycleOwner) {
                 Log.d("TAG", "handleState: DONE!")
             }
         }
     }
 
-    private lateinit var animeAndEpisodes: AnimeAndEpisodes
+    private var animeAndEpisodes: AnimeAndEpisodes? = null
     private lateinit var anime: AnimeTransformer
     private val episodes: MutableList<EpisodeTransformer> = mutableListOf()
 
@@ -59,20 +49,27 @@ class AnimeDetailsFragment : DialogFragment() {
     }
 
     private fun setRecycler() {
-        concatAdapter.addAdapter(animeDetailsAdapter)
         concatAdapter.addAdapter(0, BannerAdapter(
             BannerData(
-                animeViewModel.selectedAnime?.attributes?.posterImage?.small ?: "",
+                animeAndEpisodes?.anime?.coverImage
+                    ?: animeViewModel.selectedAnime?.attributes?.posterImage?.small
+                    ?: "",
                 true,
                 animeViewModel.playAction
             ) { dismissAllowingStateLoss() }
         ))
 
+        concatAdapter.addAdapter(animeDetailsAdapter)
         binding.animeDetails.apply {
             layoutManager =
                 LinearLayoutManager(requireContext())
             adapter = concatAdapter
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
     }
 
     override fun onCreateView(
@@ -81,10 +78,6 @@ class AnimeDetailsFragment : DialogFragment() {
     ): View {
         _binding = AnimeDetailsContainerBinding
             .inflate(inflater, container, false)
-
-        animeViewModel.animeSavedState.observe(viewLifecycleOwner) {
-            animeAndEpisodes.anime.saved = it
-        }
 
         animeViewModel.selectedAnime?.let {
             anime = AnimeTransformer(
@@ -99,13 +92,20 @@ class AnimeDetailsFragment : DialogFragment() {
             )
         }
 
+        animeViewModel.animeSavedState.observe(viewLifecycleOwner) {
+            anime.saved = it
+            animeDetailsAdapter.notifyItemChanged(1)
+        }
+
         setRecycler()
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        animeViewModel
+        animeAndEpisodes?.let {
+            animeDetailsAdapter.setAnimeAndEpisodes(it)
+        } ?: animeViewModel
             .getEpisodes(anime.animeId)
             .observe(viewLifecycleOwner, ::handleState)
 
@@ -132,7 +132,8 @@ class AnimeDetailsFragment : DialogFragment() {
                             )
                         )
                     }
-                concatAdapter.notifyItemRangeChanged(1, 1)
+                animeAndEpisodes = AnimeAndEpisodes(anime, episodes)
+                animeAndEpisodes?.let { animeDetailsAdapter.setAnimeAndEpisodes(it) }
             }
         }
     }

@@ -1,27 +1,21 @@
 package com.hcdisat.animetracker.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageButton
-import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hcdisat.animetracker.R
-import com.hcdisat.animetracker.data.database.IDatabaseRepository
 import com.hcdisat.animetracker.databinding.FragmentAnimeDetailsBinding
 import com.hcdisat.animetracker.models.transformers.AnimeAndEpisodes
-import com.hcdisat.animetracker.viewmodels.state.DBOperationsState
-import kotlinx.coroutines.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import javax.inject.Inject
 
 class AnimeDetailsAdapter(
-    private val animePresenter: AnimeAndEpisodes,
+    private var animePresenter: AnimeAndEpisodes? = null,
     private val onFavoriteClick: (animeAndEpisodes: AnimeAndEpisodes) -> Unit
 ) : RecyclerView.Adapter<AnimeDetailsViewHolder>() {
+
+    fun setAnimeAndEpisodes(animeAndEpisodes: AnimeAndEpisodes) {
+        animePresenter = animeAndEpisodes
+        notifyItemChanged(0)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimeDetailsViewHolder =
         AnimeDetailsViewHolder(
@@ -44,14 +38,14 @@ class AnimeDetailsViewHolder(
     private val onFavoriteClick: (animeAndEpisodes: AnimeAndEpisodes) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(animeTransformer: AnimeAndEpisodes) {
-        animeTransformer.anime.apply {
-            binding.animeTitle.text = titleEn
-            binding.animeTitleJp.text = titleJa
-            binding.ratingRank.text = ratingRank.toString()
-            binding.animeAgeRatingGuide.text = ageRatingGuide
-            binding.animeStatus.text = status
-            binding.animeDescription.text = description
+    fun bind(animeTransformer: AnimeAndEpisodes?) {
+        animeTransformer?.anime?.let {
+            binding.animeTitle.text = it.titleEn
+            binding.animeTitleJp.text = it.titleJa
+            binding.ratingRank.text = it.ratingRank.toString()
+            binding.animeAgeRatingGuide.text = it.ageRatingGuide
+            binding.animeStatus.text = it.status
+            binding.animeDescription.text = it.description
 
             binding.episodeList.apply {
                 layoutManager = LinearLayoutManager(

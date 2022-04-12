@@ -1,7 +1,6 @@
 package com.hcdisat.animetracker.models.transformers
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "animes")

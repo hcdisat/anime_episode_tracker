@@ -10,7 +10,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.hcdisat.animetracker.databinding.ActivityMainBinding
-import com.hcdisat.animetracker.models.Anime
 import com.hcdisat.animetracker.viewmodels.AnimeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 

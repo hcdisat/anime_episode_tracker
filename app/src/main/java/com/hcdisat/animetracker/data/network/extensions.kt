@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 import java.lang.Exception
 
+/**
+ * Not in use, left it here for future references
+ */
 inline fun IApiRepository.executeRequest(
     crossinline resource: suspend () -> Response<AnimeResponse>,
     crossinline success: (state: AnimeState) -> Unit,

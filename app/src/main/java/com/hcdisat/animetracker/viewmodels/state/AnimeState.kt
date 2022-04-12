@@ -31,5 +31,5 @@ sealed interface DBOperationsState {
     object SAVED : DBOperationsState
     object LOADING : DBOperationsState
     object ERROR : DBOperationsState
-    class RESULT_SET(val animes: List<AnimeAndEpisodes>) : DBOperationsState
+    class RESULTS(val animes: List<AnimeAndEpisodes>) : DBOperationsState
 }
