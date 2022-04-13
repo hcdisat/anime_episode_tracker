@@ -73,18 +73,16 @@ class AnimeViewModel @Inject constructor(
     }
 
     fun getEpisodes(id: String): LiveData<UIState> = liveData(ioDispatcher) {
+        emit(UIState.LOADING)
         try {
             val response = apiRepository.getEpisodes(id)
             if (response.isSuccessful) {
                 response.body()?.let {
-                    withContext(Dispatchers.Main) {
-                        emit(UIState.SUCCESS(response = it))
-                    }
+                    emit(UIState.SUCCESS(response = it))
                 }
             } else
                 throw Exception()
         } catch (e: Exception) {
-            Log.d(TAG, "getEpisodes: ${e.localizedMessage}")
             emit(UIState.ERROR(e))
         }
     }
