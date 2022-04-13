@@ -33,6 +33,7 @@ class AnimeViewModel @Inject constructor(
     val favoriteState: LiveData<DBOperationsState> = _favoriteState
 
     private val _animeSectionData: AnimeSectionData = AnimeSectionData()
+    val animeSectionData: AnimeSectionData get() = _animeSectionData
 
     var selectedAnime: Anime? = null
 
@@ -41,34 +42,34 @@ class AnimeViewModel @Inject constructor(
     fun getTrending(): LiveData<AnimeState> = liveData(ioDispatcher) {
         emit(AnimeState.LOADING)
 
-        when (_animeSectionData.trending) {
+        when (animeSectionData.trending) {
             is AnimeState.LOADING -> {
                 apiRepository.getTrending().collect {
-                    _animeSectionData.trending = it
+                    animeSectionData.trending = it
                     emit(it)
                 }
             }
-            else -> emit(_animeSectionData.trending)
+            else -> emit(animeSectionData.trending)
         }
 
-        when (_animeSectionData.popular) {
+        when (animeSectionData.popular) {
             is AnimeState.LOADING -> {
                 apiRepository.getPopular().collect {
-                    _animeSectionData.popular = it
+                    animeSectionData.popular = it
                     emit(it)
                 }
             }
-            else -> emit(_animeSectionData.popular)
+            else -> emit(animeSectionData.popular)
         }
 
-        when (_animeSectionData.rated) {
+        when (animeSectionData.rated) {
             is AnimeState.LOADING -> {
                 apiRepository.getRated().collect {
-                    _animeSectionData.rated = it
+                    animeSectionData.rated = it
                     emit(it)
                 }
             }
-            else -> emit(_animeSectionData.rated)
+            else -> emit(animeSectionData.rated)
         }
     }
 
