@@ -4,16 +4,14 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.*
 import com.hcdisat.animetracker.data.database.IDatabaseRepository
 import com.hcdisat.animetracker.data.network.IApiRepository
-import com.hcdisat.animetracker.viewmodels.state.AnimeSectionData
 import com.hcdisat.animetracker.viewmodels.state.AnimeState
-import io.mockk.InternalPlatformDsl.toArray
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -26,18 +24,19 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class AnimeViewModelTest {
 
-    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var instance: AnimeViewModel
-    private val apiRepository = mockk<IApiRepository>(relaxed = true)
-    private val databaseRepository = mockk<IDatabaseRepository>(relaxed = true)
+    private val mockApiRepository = mockk<IApiRepository>(relaxed = true)
+    private val mockDatabaseRepository = mockk<IDatabaseRepository>(relaxed = true)
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        instance = AnimeViewModel(apiRepository, databaseRepository, testDispatcher)
+        instance = AnimeViewModel(mockApiRepository, mockDatabaseRepository, testDispatcher)
     }
 
     @After
@@ -47,22 +46,59 @@ class AnimeViewModelTest {
     }
 
     @Test
-    fun `get trending anime when trying to load from server returns loading state`() = runTest {
-        instance.getTrending().observeForever {
-            assertThat(it).isInstanceOf(AnimeState.LOADING::class.java)
+    fun `get trending anime when trying to load from server returns loading state`() =
+        runTest {
+            instance.getTrending().observeForever {
+                assertThat(it).isInstanceOf(AnimeState.LOADING::class.java)
+            }
         }
-    }
 
     @Test
-    fun `get trending anime when trying to load from server returns success state`() = runTest {
+    fun `get trending anime when trying to load from server returns success state`() =
+        runTest {
 
-        coEvery { instance } returns mockk {
-            every { animeSectionData.trending } returns AnimeState.LOADING
+            coEvery { mockApiRepository.getTrending() } returns
+                    flowOf(AnimeState.SUCCESS(mockk(), mockk()))
+
+            coEvery { mockApiRepository.getPopular() } returns
+                    flowOf(AnimeState.SUCCESS(mockk(), mockk()))
+
+            coEvery { mockApiRepository.getRated() } returns
+                    flowOf(AnimeState.SUCCESS(mockk(), mockk()))
+
+            val listOfStates = mutableListOf<AnimeState>()
+
+            instance.getTrending().observeForever {
+                listOfStates.add(it)
+            }
+
+            listOfStates.filterIsInstance<AnimeState.SUCCESS>().also {
+                assertThat(it).hasSize(3)
+            }
         }
 
-        instance.getTrending().observeForever {
-            assertThat(it).isInstanceOf(AnimeState.LOADING::class.java)
+    @Test
+    fun `get trending anime when trying to load from server returns error state`() =
+        runTest {
+
+            coEvery { mockApiRepository.getTrending() } returns
+                    flowOf(AnimeState.ERROR(mockk()))
+
+            coEvery { mockApiRepository.getPopular() } returns
+                    flowOf(AnimeState.ERROR(mockk()))
+
+            coEvery { mockApiRepository.getRated() } returns
+                    flowOf(AnimeState.ERROR(mockk()))
+
+            val listOfStates = mutableListOf<AnimeState>()
+
+            instance.getTrending().observeForever {
+                listOfStates.add(it)
+            }
+
+            listOfStates.filterIsInstance<AnimeState.ERROR>().also {
+                assertThat(it).hasSize(3)
+            }
         }
-    }
 
 }
